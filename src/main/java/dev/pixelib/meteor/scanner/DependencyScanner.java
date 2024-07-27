@@ -1,32 +1,18 @@
 package dev.pixelib.meteor.scanner;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import dev.pixelib.meteor.api.Component;
 import java.util.Set;
-import java.util.stream.Collectors;
+import org.reflections.Reflections;
 
 public class DependencyScanner {
 
-    private final ClassLoader classLoader;
+    private final Reflections reflections;
 
-    public DependencyScanner(ClassLoader classLoader) {
-        this.classLoader = classLoader;
+    public DependencyScanner(Reflections reflections) {
+        this.reflections = reflections;
     }
 
-    public DependencyScanner() {
-        this.classLoader = ClassLoader.getSystemClassLoader();
-    }
-
-    public Set<String> findAllClassesUsingClassLoader(Class<?> startClass) {
-        return findAllClassesUsingClassLoader(startClass.getPackageName());
-    }
-
-    public Set<String> findAllClassesUsingClassLoader(String packageName) {
-        InputStream stream = classLoader.getResourceAsStream(packageName.replaceAll("[.]", "/"));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        return reader.lines()
-                .filter(line -> line.endsWith(".class"))
-                .collect(Collectors.toSet());
+    public Set<Class<?>> scan() {
+        return this.reflections.getTypesAnnotatedWith(Component.class);
     }
 }
