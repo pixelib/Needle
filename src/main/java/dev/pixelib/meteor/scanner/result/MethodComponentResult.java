@@ -9,26 +9,31 @@ import java.util.List;
 
 public class MethodComponentResult extends AbstractScanResult {
 
-    private final Object parentInstance;
+    private final Class<?> parentClass;
     private final Method creationMethod;
 
-    public MethodComponentResult(Object parentInstance, Method creationMethod) {
-        this.parentInstance = parentInstance;
+    public MethodComponentResult(Class<?> parentClass, Method creationMethod) {
+        this.parentClass = parentClass;
         this.creationMethod = creationMethod;
     }
-
 
     @Override
     @SneakyThrows
     protected Object doCreate(Object... parameters) {
+        // TODO: Created object should also init @Components
         creationMethod.setAccessible(true);
-        return creationMethod.invoke(parentInstance, parameters);
+        return creationMethod.invoke(parentClass, parameters);
     }
 
     @Override
     public Collection<Class<?>> getDependencies() {
         List<Class<?>> dependencies = Arrays.asList(creationMethod.getParameterTypes());
-        dependencies.add(parentInstance.getClass());
+        dependencies.add(parentClass);
         return dependencies;
+    }
+
+    @Override
+    public Class<?> getResultClass() {
+        return creationMethod.getReturnType();
     }
 }

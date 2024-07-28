@@ -5,8 +5,8 @@ import dev.pixelib.meteor.utils.ReflectionUtils;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class ClassComponentResult extends AbstractScanResult {
 
@@ -26,7 +26,12 @@ public class ClassComponentResult extends AbstractScanResult {
 
     @Override
     public Collection<Class<?>> getDependencies() {
-        return List.of();
+        return Arrays.asList(getCreationConstructor().getParameterTypes());
+    }
+
+    @Override
+    public Class<?> getResultClass() {
+        return creationClass;
     }
 
     private Constructor<?> getCreationConstructor() {
@@ -36,6 +41,11 @@ public class ClassComponentResult extends AbstractScanResult {
                 constructor = newConstructor;
             }
         }
+
+        if (constructor == null) {
+            throw new IllegalStateException("Cannot find constructor for " + creationClass.getName());
+        }
+
         return constructor;
     }
 }

@@ -1,10 +1,12 @@
 package sample;
 
-import dev.pixelib.meteor.scanner.DependencyScanner;
+import java.lang.reflect.Constructor;
 
 public class Main {
 
     public static void main(String[] args) {
-        new DependencyScanner(Main.class);
+        for (Constructor<?> constructor : B.class.getConstructors()) {
+            System.out.println(constructor.toString());
+        }
     }
 }

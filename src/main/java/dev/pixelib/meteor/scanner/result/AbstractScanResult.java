@@ -14,4 +14,6 @@ public abstract class AbstractScanResult {
     }
 
     public abstract Collection<Class<?>> getDependencies();
+
+    public abstract Class<?> getResultClass();
 }
