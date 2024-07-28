@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class MethodComponentResult extends AbstractScanResult {
@@ -20,7 +21,6 @@ public class MethodComponentResult extends AbstractScanResult {
     @Override
     @SneakyThrows
     protected Object doCreate(Object... parameters) {
-        // TODO: Created object should also init @Components
         creationMethod.setAccessible(true);
         return creationMethod.invoke(parentClass, parameters);
     }
@@ -29,11 +29,11 @@ public class MethodComponentResult extends AbstractScanResult {
     public Collection<Class<?>> getDependencies() {
         List<Class<?>> dependencies = Arrays.asList(creationMethod.getParameterTypes());
         dependencies.add(parentClass);
-        return dependencies;
+        return Collections.unmodifiableList(dependencies);
     }
 
     @Override
-    public Class<?> getResultClass() {
+    public Class<?> getResultType() {
         return creationMethod.getReturnType();
     }
 }
