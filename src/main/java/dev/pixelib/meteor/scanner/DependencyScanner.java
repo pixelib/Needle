@@ -7,6 +7,7 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,16 +24,21 @@ public class DependencyScanner {
         this.dependencyCount = new HashMap<>();
     }
 
-
     public void findAllComponents() {
         Set<Class<?>> classes = this.reflections.getTypesAnnotatedWith(Component.class);
 
         classes.forEach(this::findAllMethodComponents);
+
+        ensureNoCircularDependency();
+
+        countDependencies();
     }
 
-    public void countDependencies() {
+    private void countDependencies() {
         for (AbstractScanResult value : results.values()) {
-            value.getDependencies().stream().map()
+            if (!dependencyCount.containsKey(value.getResultType())) {
+                dependencyCount.put(value.getResultType(), getDependencyCount(value));
+            }
         }
     }
 
@@ -58,5 +64,36 @@ public class DependencyScanner {
                 findAllMethodComponents(methodComponentResult.getResultType());
             }
         }
+    }
+
+    public void ensureNoCircularDependency() {
+        Set<Class<?>> visited = new HashSet<>();
+        Set<Class<?>> stack = new HashSet<>();
+        for (AbstractScanResult result : results.values()) {
+            if (checkDependency(result, visited, stack)) {
+                throw new IllegalStateException("Circular dependency found: " + String.join(" -> ", stack.stream().map(Class::getSimpleName).toList()));
+            }
+        }
+    }
+
+    private boolean checkDependency(AbstractScanResult result, Set<Class<?>> visited, Set<Class<?>> stack) {
+        if (stack.contains(result.getResultType())) {
+            return true;
+        }
+        if (visited.contains(result.getResultType())) {
+            return false;
+        }
+
+        visited.add(result.getResultType());
+        stack.add(result.getResultType());
+
+        for (Class<?> dependency : result.getDependencies()) {
+            if (checkDependency(results.get(dependency), visited, stack)) {
+                return true;
+            }
+        }
+
+        stack.remove(result.getResultType());
+        return false;
     }
 }
