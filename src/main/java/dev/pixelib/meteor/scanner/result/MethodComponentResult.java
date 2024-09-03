@@ -3,10 +3,7 @@ package dev.pixelib.meteor.scanner.result;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MethodComponentResult extends AbstractScanResult {
 
@@ -22,13 +19,14 @@ public class MethodComponentResult extends AbstractScanResult {
     @SneakyThrows
     protected Object doCreate(Object... parameters) {
         creationMethod.setAccessible(true);
-        return creationMethod.invoke(parentClass, parameters);
+        return creationMethod.invoke(parameters[0], Arrays.copyOfRange(parameters, 1, parameters.length));
     }
 
     @Override
     public Collection<Class<?>> getDependencies() {
-        List<Class<?>> dependencies = Arrays.asList(creationMethod.getParameterTypes());
+        List<Class<?>> dependencies = new ArrayList<>();
         dependencies.add(parentClass);
+        dependencies.addAll(Arrays.asList(creationMethod.getParameterTypes()));
         return Collections.unmodifiableList(dependencies);
     }
 

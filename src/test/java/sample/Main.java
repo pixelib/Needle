@@ -1,12 +1,15 @@
 package sample;
 
-import java.lang.reflect.Constructor;
+import dev.pixelib.meteor.Needle;
 
 public class Main {
 
     public static void main(String[] args) {
-        for (Constructor<?> constructor : B.class.getConstructors()) {
-            System.out.println(constructor.toString());
-        }
+        Needle init = Needle.init(Main.class);
+
+        System.out.println("Found");
+        init.getComponents().forEach((key, value) -> {
+            System.out.println(key.getSimpleName() + ":" + value.toString());
+        });
     }
 }

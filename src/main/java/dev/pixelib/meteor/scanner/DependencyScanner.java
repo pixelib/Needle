@@ -2,14 +2,12 @@ package dev.pixelib.meteor.scanner;
 
 import dev.pixelib.meteor.api.Component;
 import dev.pixelib.meteor.scanner.result.AbstractScanResult;
+import dev.pixelib.meteor.scanner.result.ClassComponentResult;
 import dev.pixelib.meteor.scanner.result.MethodComponentResult;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DependencyScanner {
 
@@ -24,15 +22,28 @@ public class DependencyScanner {
         this.dependencyCount = new HashMap<>();
     }
 
-    public void findAllComponents() {
+    public List<AbstractScanResult> findAllComponents() {
         Set<Class<?>> classes = this.reflections.getTypesAnnotatedWith(Component.class);
+
+        classes.forEach(this::saveClassComponent);
 
         classes.forEach(this::findAllMethodComponents);
 
+        ensureNoMissingDependencies();
         ensureNoCircularDependency();
 
         countDependencies();
+
+        return dependencyCount.entrySet().stream()
+                .sorted(Comparator.comparingInt(Map.Entry::getValue))
+                .map(entry -> results.get(entry.getKey()))
+                .toList();
     }
+
+    private void saveClassComponent(Class<?> aClass) {
+        this.results.put(aClass, new ClassComponentResult(aClass));
+    }
+
 
     private void countDependencies() {
         for (AbstractScanResult value : results.values()) {
@@ -72,6 +83,20 @@ public class DependencyScanner {
         for (AbstractScanResult result : results.values()) {
             if (checkDependency(result, visited, stack)) {
                 throw new IllegalStateException("Circular dependency found: " + String.join(" -> ", stack.stream().map(Class::getSimpleName).toList()));
+            }
+        }
+    }
+
+    public void ensureNoMissingDependencies() {
+        for (AbstractScanResult result : results.values()) {
+            if (result.getDependencies().contains(result.getResultType())) {
+                throw new IllegalStateException(result.getResultType().getSimpleName() + " can not be dependent on itself");
+            }
+
+            for (Class<?> dependency : result.getDependencies()) {
+                if (!results.containsKey(dependency)) {
+                    throw new IllegalStateException(dependency.getSimpleName() + " dependency " + dependency.getSimpleName() + " not found for" + result.getResultType().getSimpleName());
+                }
             }
         }
     }

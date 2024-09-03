@@ -2,12 +2,15 @@ package dev.pixelib.meteor;
 
 import dev.pixelib.meteor.api.PreDestroy;
 import dev.pixelib.meteor.scanner.DependencyScanner;
+import dev.pixelib.meteor.scanner.result.AbstractScanResult;
 import dev.pixelib.meteor.utils.ReflectionUtils;
+import lombok.Getter;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,13 +22,20 @@ public class Needle {
     private final NeedleSettings settings;
     private final Class<?> appClass;
     private final Reflections reflections;
-    private final List<Object> components = new ArrayList<>();
+
+    @Getter
+    private final Map<Class<?>, Object> components = new HashMap<>();
+
+    public static Needle init(Class<?> app) {
+        return init(app, unused -> {
+        });
+    }
 
     public static Needle init(Class<?> app, Consumer<NeedleSettings> settings) {
         NeedleSettings needleSettings = NeedleSettings.getDefaultSettings();
         settings.accept(needleSettings);
         Needle needle = new Needle(app, needleSettings);
-        needle.init();
+        needle.createInstances();
         return needle;
     }
 
@@ -36,15 +46,18 @@ public class Needle {
         this.reflections = new Reflections(app.getPackage().getName());
     }
 
-    private void init() {
+    private void createInstances() {
         if (settings.isShutdownHookAutoRegister()) {
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> components.forEach(this::invokeShutdown), "needle-shutdown-hook"));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> components.values().forEach(this::invokeShutdown), "needle-shutdown-hook"));
         }
 
         DependencyScanner dependencyScanner = new DependencyScanner(this.reflections);
-        dependencyScanner.findAllComponents();
+        List<AbstractScanResult> scannedComponents = dependencyScanner.findAllComponents();
 
-
+        for (AbstractScanResult scannedComponent : scannedComponents) {
+            Object[] requiredDependencies = scannedComponent.getDependencies().stream().map(components::get).toArray(Object[]::new);
+            components.put(scannedComponent.getResultType(), scannedComponent.create(requiredDependencies));
+        }
     }
 
     private void invokeShutdown(Object object) {
