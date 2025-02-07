@@ -1,11 +1,11 @@
-package dev.pixelib.meteor.api;
+package dev.pixelib.needle.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Wired {
+public @interface PostConstruct {
 }

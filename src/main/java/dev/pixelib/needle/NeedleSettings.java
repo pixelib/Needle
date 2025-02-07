@@ -1,4 +1,4 @@
-package dev.pixelib.meteor;
+package dev.pixelib.needle;
 
 import lombok.Getter;
 import lombok.Setter;

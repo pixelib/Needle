@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>dev.pixelib.meteor</groupId>
+  <groupId>dev.pixelib.needle</groupId>
   <artifactId>needle</artifactId>
   <version>1.0-SNAPSHOT</version>
 
@@ -32,9 +32,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/pixelib/Meteor.git</connection>
-    <developerConnection>scm:git:ssh://github.com/pixelib/Meteor.git</developerConnection>
-    <url>https://github.com/pixelib/Meteor</url>
+    <connection>scm:git:git://github.com/pixelib/needle.git</connection>
+    <developerConnection>scm:git:ssh://github.com/pixelib/needle.git</developerConnection>
+    <url>https://github.com/pixelib/needle</url>
   </scm>
 
 

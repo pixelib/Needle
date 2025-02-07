@@ -1,4 +1,4 @@
-package dev.pixelib.meteor.scanner.result;
+package dev.pixelib.needle.scanner.result;
 
 import lombok.SneakyThrows;
 

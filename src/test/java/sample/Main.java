@@ -1,6 +1,6 @@
 package sample;
 
-import dev.pixelib.meteor.Needle;
+import dev.pixelib.needle.Needle;
 
 public class Main {
 

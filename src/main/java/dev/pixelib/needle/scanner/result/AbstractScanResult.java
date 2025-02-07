@@ -1,6 +1,6 @@
-package dev.pixelib.meteor.scanner.result;
+package dev.pixelib.needle.scanner.result;
 
-import dev.pixelib.meteor.api.Wired;
+import dev.pixelib.needle.api.Wired;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;

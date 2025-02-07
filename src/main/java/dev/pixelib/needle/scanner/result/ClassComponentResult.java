@@ -1,12 +1,10 @@
-package dev.pixelib.meteor.scanner.result;
+package dev.pixelib.needle.scanner.result;
 
-import dev.pixelib.meteor.api.PostConstruct;
-import dev.pixelib.meteor.api.Wired;
-import dev.pixelib.meteor.utils.ReflectionUtils;
+import dev.pixelib.needle.api.PostConstruct;
+import dev.pixelib.needle.utils.ReflectionUtils;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class ClassComponentResult extends AbstractScanResult {

@@ -1,6 +1,6 @@
 package sample;
 
-import dev.pixelib.meteor.api.Wired;
+import dev.pixelib.needle.api.Wired;
 import lombok.Getter;
 import sample.secret.C;
 

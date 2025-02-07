@@ -1,4 +1,4 @@
-package dev.pixelib.meteor.utils;
+package dev.pixelib.needle.utils;
 
 import lombok.experimental.UtilityClass;
 

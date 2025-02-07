@@ -1,6 +1,6 @@
 package sample;
 
-import dev.pixelib.meteor.api.Component;
+import dev.pixelib.needle.api.Component;
 
 @Component
 public class A {

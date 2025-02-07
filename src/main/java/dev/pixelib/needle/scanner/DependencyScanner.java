@@ -1,9 +1,9 @@
-package dev.pixelib.meteor.scanner;
+package dev.pixelib.needle.scanner;
 
-import dev.pixelib.meteor.api.Component;
-import dev.pixelib.meteor.scanner.result.AbstractScanResult;
-import dev.pixelib.meteor.scanner.result.ClassComponentResult;
-import dev.pixelib.meteor.scanner.result.MethodComponentResult;
+import dev.pixelib.needle.api.Component;
+import dev.pixelib.needle.scanner.result.AbstractScanResult;
+import dev.pixelib.needle.scanner.result.ClassComponentResult;
+import dev.pixelib.needle.scanner.result.MethodComponentResult;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Method;

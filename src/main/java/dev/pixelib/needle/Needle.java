@@ -1,9 +1,9 @@
-package dev.pixelib.meteor;
+package dev.pixelib.needle;
 
-import dev.pixelib.meteor.api.PreDestroy;
-import dev.pixelib.meteor.scanner.DependencyScanner;
-import dev.pixelib.meteor.scanner.result.AbstractScanResult;
-import dev.pixelib.meteor.utils.ReflectionUtils;
+import dev.pixelib.needle.api.PreDestroy;
+import dev.pixelib.needle.scanner.DependencyScanner;
+import dev.pixelib.needle.scanner.result.AbstractScanResult;
+import dev.pixelib.needle.utils.ReflectionUtils;
 import lombok.Getter;
 import org.reflections.Reflections;
 
