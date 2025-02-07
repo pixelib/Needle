@@ -46,6 +46,10 @@ public class Needle {
         this.reflections = new Reflections(app.getPackage().getName());
     }
 
+    public <T> T getComponent(Class<T> clazz) {
+        return clazz.cast(components.get(clazz));
+    }
+
     private void createInstances() {
         if (settings.isShutdownHookAutoRegister()) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> components.values().forEach(this::invokeShutdown), "needle-shutdown-hook"));

@@ -11,5 +11,7 @@ public class Main {
         init.getComponents().forEach((key, value) -> {
             System.out.println(key.getSimpleName() + ":" + value.toString());
         });
+
+        init.getComponent(B.class).getDepC().sout();
     }
 }

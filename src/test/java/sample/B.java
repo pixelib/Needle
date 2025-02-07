@@ -1,11 +1,13 @@
 package sample;
 
 import dev.pixelib.meteor.api.Wired;
+import lombok.Getter;
 import sample.secret.C;
 
-public class B {
+        @Getter
+        public class B {
 
-    @Wired
-    private C depC;
+            @Wired
+            private C depC;
 
-}
+        }

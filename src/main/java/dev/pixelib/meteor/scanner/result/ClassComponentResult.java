@@ -54,36 +54,4 @@ public class ClassComponentResult extends AbstractScanResult {
 
         return constructor;
     }
-
-    private Collection<Class<?>> getWiredDependencies() {
-        List<Class<?>> dependencies = new ArrayList<>();
-        for (Field declaredField : creationClass.getDeclaredFields()) {
-            if (!declaredField.isAnnotationPresent(Wired.class)) continue;
-
-            dependencies.add(declaredField.getType());
-        }
-
-        return dependencies;
-    }
-
-    private void setFields(Object instance, Object... parameters) {
-        for (Field declaredField : creationClass.getDeclaredFields()) {
-            if (!declaredField.isAnnotationPresent(Wired.class)) continue;
-            declaredField.setAccessible(true);
-
-            try {
-                declaredField.set(instance, getMatchingParameters(declaredField.getType(), parameters));
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-    }
-
-    private Object getMatchingParameters(Class<?> type, Object... paramaters) {
-        for (Object paramater : paramaters) {
-            if (paramater.getClass().equals(type)) return paramater;
-        }
-
-        throw new IllegalStateException("Cannot find matching parameters for " + type.getName());
-    }
 }

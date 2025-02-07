@@ -19,7 +19,11 @@ public class MethodComponentResult extends AbstractScanResult {
     @SneakyThrows
     protected Object doCreate(Object... parameters) {
         creationMethod.setAccessible(true);
-        return creationMethod.invoke(parameters[0], parameters.length > 1 ? Arrays.copyOfRange(parameters, 1, parameters.length) : new Object[]{});
+        Object created = creationMethod.invoke(parameters[0], parameters.length > 1 ? Arrays.copyOfRange(parameters, 1, creationMethod.getParameterCount() + 1) : new Object[]{});
+
+        setFields(created, parameters);
+
+        return created;
     }
 
     @Override
@@ -27,6 +31,7 @@ public class MethodComponentResult extends AbstractScanResult {
         List<Class<?>> dependencies = new ArrayList<>();
         dependencies.add(parentClass);
         dependencies.addAll(Arrays.asList(creationMethod.getParameterTypes()));
+        dependencies.addAll(getWiredDependencies());
         return Collections.unmodifiableList(dependencies);
     }
 
