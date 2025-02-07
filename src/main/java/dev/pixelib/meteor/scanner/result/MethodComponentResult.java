@@ -19,7 +19,7 @@ public class MethodComponentResult extends AbstractScanResult {
     @SneakyThrows
     protected Object doCreate(Object... parameters) {
         creationMethod.setAccessible(true);
-        return creationMethod.invoke(parameters[0], Arrays.copyOfRange(parameters, 1, parameters.length));
+        return creationMethod.invoke(parameters[0], parameters.length > 1 ? Arrays.copyOfRange(parameters, 1, parameters.length) : new Object[]{});
     }
 
     @Override

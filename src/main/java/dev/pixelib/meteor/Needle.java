@@ -56,6 +56,7 @@ public class Needle {
 
         for (AbstractScanResult scannedComponent : scannedComponents) {
             Object[] requiredDependencies = scannedComponent.getDependencies().stream().map(components::get).toArray(Object[]::new);
+
             components.put(scannedComponent.getResultType(), scannedComponent.create(requiredDependencies));
         }
     }

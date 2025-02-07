@@ -1,12 +1,11 @@
 package sample;
 
+import dev.pixelib.meteor.api.Wired;
 import sample.secret.C;
 
 public class B {
 
-    private final C depC;
+    @Wired
+    private C depC;
 
-    public B(C c) {
-        this.depC = c;
-    }
 }

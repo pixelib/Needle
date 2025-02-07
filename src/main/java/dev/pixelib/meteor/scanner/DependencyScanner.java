@@ -32,6 +32,7 @@ public class DependencyScanner {
         ensureNoMissingDependencies();
         ensureNoCircularDependency();
 
+
         countDependencies();
 
         return dependencyCount.entrySet().stream()
@@ -57,7 +58,7 @@ public class DependencyScanner {
         if (result == null) {
             throw new IllegalStateException("Cannot get dependency count for null result");
         }
-        int count = 0;
+        int count = result.getDependencies().size();
         for (Class<?> dependency : result.getDependencies()) {
             count += dependencyCount.computeIfAbsent(dependency, t -> getDependencyCount(results.get(t)));
         }
