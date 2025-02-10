@@ -1,21 +1,21 @@
 <p align="center">
-  <img src=".github/assets/logo.svg" alt="logo">
+  <img src=".github/assets/remove-bg-preview.png" alt="logo">
 </p>
 
-# Needle 
+# 🌱 Needle  ![Test Coverage](https://img.shields.io/badge/Test%20Coverage-prima-pink?&style=plastic) ![Hyves](https://img.shields.io/badge/Hyves-follow-green?labelColor=GREEN&style=social)
 
 Needle is an ultra-lightweight dependency injection framework for Java, similar to Spring. It simplifies the management of dependencies in your application, making your code more modular, testable, and maintainable.
 
-## Features
+## ✨ Features
 
 - **Lightweight**: Minimal overhead, designed to be fast and efficient.
 - **Annotation-based**: Use simple annotations to define dependencies.
 - **Automatic Dependency Resolution**: Automatically resolves and injects dependencies.
 - **Integration**: Easily integrates with other frameworks and libraries.
 
-## Usage
+## 🚀 Usage
 
-### Main class Example
+### 📘 Main class Example
 
 ```java
 public class Main {
@@ -25,7 +25,7 @@ public class Main {
 }
 ```
 
-### Class components Example
+### 📙 Class components Example
 
 ```java
 @Component
@@ -34,7 +34,7 @@ public class ExampleService {
     private String name;
 }
 ```
-### Method components Example
+### 📗 Method components Example
 
 ```java
 @Component
@@ -48,7 +48,7 @@ public class SampleConfig {
 
 ```
 
-### Defining Dependencies
+### 📕 Defining Dependencies
 
 ```java
 
@@ -72,7 +72,7 @@ public class SampleService {
 }
 ```
 
-## Installation
+## 📦 Installation
 
 Add the following dependency to your Maven project:
 
@@ -84,11 +84,11 @@ Add the following dependency to your Maven project:
 </dependency>
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 ```
