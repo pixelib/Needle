@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 0 200 200"
+        width="200"
+        height="200"
+        fill="none">
+
+    <!-- Background Circle for Depth -->
+    <circle cx="100" cy="100" r="80" fill="#f0f0f0" stroke="#d0d0d0" stroke-width="2" />
+
+    <!-- Stylized Interconnecting Nodes -->
+    <circle cx="60" cy="60" r="18" fill="#007BFF" stroke="white" stroke-width="3" />
+    <circle cx="140" cy="60" r="18" fill="#28A745" stroke="white" stroke-width="3" />
+    <circle cx="100" cy="140" r="18" fill="#FFC107" stroke="white" stroke-width="3" />
+
+    <!-- Connecting Paths with Rounded Style -->
+    <path d="M 75 60 Q 100 20, 125 60" stroke="#007BFF" fill="none" stroke-width="6" stroke-linecap="round" />
+    <path d="M 60 80 Q 100 120, 140 80" stroke="#28A745" fill="none" stroke-width="6" stroke-linecap="round" />
+    <path d="M 100 120 Q 90 100, 60 80" stroke="#FFC107" fill="none" stroke-width="6" stroke-linecap="round" />
+    <path d="M 100 120 Q 110 100, 140 80" stroke="#DC3545" fill="none" stroke-width="6" stroke-linecap="round" />
+
+    <!-- Adding a Soft Shadow Effect -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="black" flood-opacity="0.2"/>
+    </filter>
+
+    <!-- Apply Shadow to Circles -->
+    <circle cx="60" cy="60" r="18" fill="#007BFF" filter="url(#shadow)" />
+    <circle cx="140" cy="60" r="18" fill="#28A745" filter="url(#shadow)" />
+    <circle cx="100" cy="140" r="18" fill="#FFC107" filter="url(#shadow)" />
+</svg>
