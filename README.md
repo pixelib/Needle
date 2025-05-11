@@ -1,8 +1,6 @@
-<p align="center">
-  <img src=".github/assets/remove-bg-preview.png" alt="logo">
-</p>
+<img src="https://github.com/user-attachments/assets/f7c677ea-2207-41ae-bab3-a19b375c6d0f" alt="logo">
 
-# 🌱 Needle  ![Test Coverage](https://img.shields.io/badge/Test%20Coverage-prima-pink?&style=plastic) ![Hyves](https://img.shields.io/badge/Hyves-follow-green?labelColor=GREEN&style=social)
+# Needle  ![Test Coverage](https://img.shields.io/badge/Test%20Coverage-prima-pink?&style=plastic) ![Hyves](https://img.shields.io/badge/Hyves-follow-green?labelColor=GREEN&style=social)
 
 Needle is an ultra-lightweight dependency injection framework for Java, similar to Spring. It simplifies the management of dependencies in your application, making your code more modular, testable, and maintainable.
 
