@@ -1,4 +1,7 @@
-<img src="https://github.com/user-attachments/assets/f7c677ea-2207-41ae-bab3-a19b375c6d0f" alt="logo">
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/1400bd15-e483-42cc-aa5d-cc52a5150ee0" />
+
+</p>
 
 # Needle  ![Test Coverage](https://img.shields.io/badge/Test%20Coverage-prima-pink?&style=plastic) ![Hyves](https://img.shields.io/badge/Hyves-follow-green?labelColor=GREEN&style=social)
 
