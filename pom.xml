@@ -8,6 +8,10 @@
   <artifactId>needle</artifactId>
   <version>${revision}</version>
 
+  <name>Needle</name>
+  <description>An ultra lightweight dependency injection framework like Spring</description>
+  <url>https://github.com/pixelib/Needle</url>
+
   <properties>
     <revision>0-localbuild-SNAPSHOT</revision>
     <maven.compiler.source>17</maven.compiler.source>
