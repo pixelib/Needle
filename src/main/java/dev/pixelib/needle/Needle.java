@@ -24,7 +24,7 @@ public class Needle {
     private final Reflections reflections;
 
     @Getter
-    private final Map<Class<?>, Object> components = new HashMap<>();
+    private final Map<Class<?>, Map<String, Object>> components = new HashMap<>();
 
     public static Needle init(Class<?> app) {
         return init(app, unused -> {
@@ -47,21 +47,40 @@ public class Needle {
     }
 
     public <T> T getComponent(Class<T> clazz) {
-        return clazz.cast(components.get(clazz));
+        Map<String, Object> namedBeans = components.get(clazz);
+        if (namedBeans == null || namedBeans.isEmpty()) return null;
+        if (namedBeans.size() == 1) return clazz.cast(namedBeans.values().iterator().next());
+
+        Object unnamed = namedBeans.get("");
+        if (unnamed != null) return clazz.cast(unnamed);
+
+        throw new IllegalStateException("Multiple named beans of type " + clazz.getSimpleName()
+                + " found. Use getComponent(Class, String) or @Named to select one.");
+    }
+
+    public <T> T getComponent(Class<T> clazz, String name) {
+        Map<String, Object> namedBeans = components.get(clazz);
+        if (namedBeans == null) return null;
+        return clazz.cast(namedBeans.get(name));
     }
 
     private void createInstances() {
         if (settings.isShutdownHookAutoRegister()) {
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> components.values().forEach(this::invokeShutdown), "needle-shutdown-hook"));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                for (Map<String, Object> namedBeans : components.values()) {
+                    namedBeans.values().forEach(this::invokeShutdown);
+                }
+            }, "needle-shutdown-hook"));
         }
 
         DependencyScanner dependencyScanner = new DependencyScanner(this.reflections);
         List<AbstractScanResult> scannedComponents = dependencyScanner.findAllComponents();
 
         for (AbstractScanResult scannedComponent : scannedComponents) {
-            Object[] requiredDependencies = scannedComponent.getDependencies().stream().map(components::get).toArray(Object[]::new);
+            Object instance = scannedComponent.create(components);
 
-            components.put(scannedComponent.getResultType(), scannedComponent.create(requiredDependencies));
+            components.computeIfAbsent(scannedComponent.getResultType(), k -> new HashMap<>())
+                    .put(scannedComponent.getName(), instance);
         }
     }
 

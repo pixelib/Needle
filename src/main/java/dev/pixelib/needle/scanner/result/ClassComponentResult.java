@@ -1,10 +1,15 @@
 package dev.pixelib.needle.scanner.result;
 
+import dev.pixelib.needle.api.Component;
+import dev.pixelib.needle.api.Named;
 import dev.pixelib.needle.api.PostConstruct;
+import dev.pixelib.needle.api.Wired;
 import dev.pixelib.needle.utils.ReflectionUtils;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 public class ClassComponentResult extends AbstractScanResult {
@@ -32,6 +37,20 @@ public class ClassComponentResult extends AbstractScanResult {
     }
 
     @Override
+    @SneakyThrows
+    protected Object doCreate(Object[] params, Map<Class<?>, Map<String, Object>> componentStore) {
+        Constructor<?> constructor = getCreationConstructor();
+        Object[] constructorParams = Arrays.copyOf(params, constructor.getParameterCount());
+
+        Object object = constructor.newInstance(constructorParams);
+        ReflectionUtils.callMethodWithAnnotation(PostConstruct.class, object);
+
+        setFields(object, componentStore);
+
+        return object;
+    }
+
+    @Override
     public Collection<Class<?>> getDependencies() {
         List<Class<?>> paramDependencies = new ArrayList<>(Arrays.asList(getCreationConstructor().getParameterTypes()));
         paramDependencies.addAll(getWiredDependencies());
@@ -39,8 +58,32 @@ public class ClassComponentResult extends AbstractScanResult {
     }
 
     @Override
+    public List<String> getDependencyNames() {
+        List<String> names = new ArrayList<>();
+        for (Parameter param : getCreationConstructor().getParameters()) {
+            Named named = param.getAnnotation(Named.class);
+            names.add(named != null ? named.value() : "");
+        }
+        for (Field wiredField : getResultType().getDeclaredFields()) {
+            if (!wiredField.isAnnotationPresent(Wired.class)) continue;
+            Named named = wiredField.getAnnotation(Named.class);
+            names.add(named != null ? named.value() : "");
+        }
+        return names;
+    }
+
+    @Override
     public Class<?> getResultType() {
         return creationClass;
+    }
+
+    @Override
+    public String getName() {
+        Component component = creationClass.getAnnotation(Component.class);
+        if (component != null && !component.value().isEmpty()) {
+            return component.value();
+        }
+        return "";
     }
 
     private Constructor<?> getCreationConstructor() {

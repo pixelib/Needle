@@ -1,12 +1,14 @@
 package dev.pixelib.needle.scanner.result;
 
 import dev.pixelib.needle.api.Component;
+import dev.pixelib.needle.api.Named;
 import dev.pixelib.needle.api.PostConstruct;
 import dev.pixelib.needle.api.Wired;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,6 +88,49 @@ class ClassComponentResultTest {
         assertEquals(SimpleComponent.class, result.getResultType());
     }
 
+    @Test
+    @DisplayName("getName should return @Component value when set")
+    void getNameShouldReturnComponentValue() {
+        ClassComponentResult result = new ClassComponentResult(NamedComponent.class);
+
+        assertEquals("myName", result.getName());
+    }
+
+    @Test
+    @DisplayName("getName should return empty string when @Component has no value")
+    void getNameShouldReturnEmptyWhenNoValue() {
+        ClassComponentResult result = new ClassComponentResult(SimpleComponent.class);
+
+        assertEquals("", result.getName());
+    }
+
+    @Test
+    @DisplayName("getDependencyNames should return empty strings for unnamed deps")
+    void getDependencyNamesShouldReturnEmptyForUnnamed() {
+        ClassComponentResult result = new ClassComponentResult(ComplexComponent.class);
+
+        List<String> names = result.getDependencyNames();
+
+        assertEquals(2, names.size());
+        assertTrue(names.stream().allMatch(String::isEmpty));
+    }
+
+    @Test
+    @DisplayName("getDependencyNames should return @Named values for named deps")
+    void getDependencyNamesShouldReturnNamedValues() {
+        ClassComponentResult result = new ClassComponentResult(NamedDepsComponent.class);
+
+        List<String> names = result.getDependencyNames();
+
+        assertEquals(2, names.size());
+        assertEquals("greeting", names.get(0));
+        assertEquals("count", names.get(1));
+    }
+
+    @Component("myName")
+    static class NamedComponent {
+    }
+
     @Component
     static class SimpleComponent {
     }
@@ -137,6 +182,15 @@ class ClassComponentResultTest {
         }
 
         @Wired
+        private Integer number;
+    }
+
+    static class NamedDepsComponent {
+        NamedDepsComponent(@Named("greeting") String s) {
+        }
+
+        @Wired
+        @Named("count")
         private Integer number;
     }
 }

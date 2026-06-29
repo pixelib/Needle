@@ -121,6 +121,40 @@ class DependencyScannerTest {
         assertEquals(1, results.size());
     }
 
+    @Test
+    @DisplayName("should throw on duplicate unnamed method components of same type")
+    void shouldThrowOnDuplicateUnnamedMethodComponents() {
+        when(reflections.getTypesAnnotatedWith(Component.class))
+                .thenReturn(Set.of(UnnamedDuplicateFactory.class));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> scanner.findAllComponents());
+        assertTrue(ex.getMessage().contains("Duplicate component"));
+        assertTrue(ex.getMessage().contains("UnnamedDuplicateFactory"));
+    }
+
+    @Test
+    @DisplayName("should allow duplicate named method components with different names")
+    void shouldAllowDuplicateNamedMethodComponents() {
+        when(reflections.getTypesAnnotatedWith(Component.class))
+                .thenReturn(Set.of(NamedDuplicateFactory.class));
+
+        List<AbstractScanResult> results = scanner.findAllComponents();
+
+        assertEquals(3, results.size()); // factory class + 2 named String beans
+    }
+
+    @Test
+    @DisplayName("should throw on duplicate components with same @Component name")
+    void shouldThrowOnDuplicateSameName() {
+        when(reflections.getTypesAnnotatedWith(Component.class))
+                .thenReturn(Set.of(SameNameDuplicateFactory.class));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> scanner.findAllComponents());
+        assertTrue(ex.getMessage().contains("same @Component name"));
+    }
+
     @Component
     static class SimpleComponent {
     }
@@ -162,5 +196,44 @@ class DependencyScannerTest {
     }
 
     static class UnknownComponent {
+    }
+
+    @Component
+    static class UnnamedDuplicateFactory {
+        @Component
+        String createOne() {
+            return "one";
+        }
+
+        @Component
+        String createTwo() {
+            return "two";
+        }
+    }
+
+    @Component
+    static class NamedDuplicateFactory {
+        @Component("a")
+        String createA() {
+            return "a";
+        }
+
+        @Component("b")
+        String createB() {
+            return "b";
+        }
+    }
+
+    @Component
+    static class SameNameDuplicateFactory {
+        @Component("dup")
+        String createOne() {
+            return "one";
+        }
+
+        @Component("dup")
+        String createTwo() {
+            return "two";
+        }
     }
 }

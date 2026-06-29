@@ -1,12 +1,14 @@
 package dev.pixelib.needle.scanner.result;
 
 import dev.pixelib.needle.api.Component;
+import dev.pixelib.needle.api.Named;
 import dev.pixelib.needle.api.Wired;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,6 +73,78 @@ class MethodComponentResultTest {
         assertEquals(String.class, result.getResultType());
     }
 
+    @Test
+    @DisplayName("getName should return @Component value from method")
+    void getNameShouldReturnComponentValue() throws Exception {
+        Method factoryMethod = NamedFactory.class.getDeclaredMethod("createNamed");
+        MethodComponentResult result = new MethodComponentResult(NamedFactory.class, factoryMethod);
+
+        assertEquals("namedBean", result.getName());
+    }
+
+    @Test
+    @DisplayName("getName should return empty when @Component has no value on method")
+    void getNameShouldReturnEmptyWhenNoValue() throws Exception {
+        Method factoryMethod = FactoryHost.class.getDeclaredMethod("createSimple");
+        MethodComponentResult result = new MethodComponentResult(FactoryHost.class, factoryMethod);
+
+        assertEquals("", result.getName());
+    }
+
+    @Test
+    @DisplayName("getDependencyNames should include parent as empty and method params with @Named")
+    void getDependencyNamesShouldIncludeNamedParams() throws Exception {
+        Method factoryMethod = UnnamedFactory.class.getDeclaredMethod("create", String.class);
+        MethodComponentResult result = new MethodComponentResult(UnnamedFactory.class, factoryMethod);
+
+        List<String> names = result.getDependencyNames();
+
+        assertEquals(2, names.size()); // parent + 1 method param
+        assertEquals("", names.get(0)); // parent - no @Named
+        assertEquals("prefix", names.get(1)); // method param with @Named
+    }
+
+    @Test
+    @DisplayName("getDependencyNames should include wired field names for named wired fields")
+    void getDependencyNamesShouldIncludeWiredFieldNames() throws Exception {
+        Method factoryMethod = WiredNamedFactory.class.getDeclaredMethod("createWiredNamed");
+        MethodComponentResult result = new MethodComponentResult(WiredNamedFactory.class, factoryMethod);
+
+        List<String> names = result.getDependencyNames();
+
+        assertEquals(2, names.size()); // parent + 1 wired field
+        assertEquals("", names.get(0)); // parent - no @Named
+        assertEquals("suffix", names.get(1)); // wired field with @Named
+    }
+
+    static class NamedFactory {
+        @Component("namedBean")
+        String createNamed() {
+            return "named";
+        }
+    }
+
+    static class UnnamedFactory {
+        @Component
+        String create(@Named("prefix") String p) {
+            return p;
+        }
+    }
+
+    public static class WiredNamedTarget {
+        @Wired
+        @Named("suffix")
+        private String value;
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
+
     static class FactoryHost {
         @Component
         String createSimple() {
@@ -96,6 +170,13 @@ class MethodComponentResultTest {
 
         public String getValue() {
             return value;
+        }
+    }
+
+    static class WiredNamedFactory {
+        @Component
+        WiredNamedTarget createWiredNamed() {
+            return new WiredNamedTarget();
         }
     }
 }

@@ -13,7 +13,7 @@ public class DependencyScanner {
 
     private final Reflections reflections;
 
-    private final Map<Class<?>, AbstractScanResult> results;
+    private final Map<Class<?>, List<AbstractScanResult>> results;
     private final Map<Class<?>, Integer> dependencyCount;
 
     public DependencyScanner(Reflections reflections) {
@@ -35,21 +35,60 @@ public class DependencyScanner {
 
         countDependencies();
 
-        return dependencyCount.entrySet().stream()
-                .sorted(Comparator.comparingInt(Map.Entry::getValue))
-                .map(entry -> results.get(entry.getKey()))
+        return results.values().stream()
+                .flatMap(List::stream)
+                .sorted(Comparator.comparingInt(r -> dependencyCount.getOrDefault(r.getResultType(), 0)))
                 .toList();
     }
 
     private void saveClassComponent(Class<?> aClass) {
-        this.results.put(aClass, new ClassComponentResult(aClass));
+        ClassComponentResult result = new ClassComponentResult(aClass);
+        checkForDuplicate(result.getResultType(), result);
+        results.computeIfAbsent(aClass, k -> new ArrayList<>()).add(result);
+    }
+
+    private void checkForDuplicate(Class<?> type, AbstractScanResult newResult) {
+        List<AbstractScanResult> existingList = results.get(type);
+        if (existingList == null) return;
+
+        String newName = newResult.getName();
+
+        for (AbstractScanResult existing : existingList) {
+            String existingName = existing.getName();
+
+            if (newName.isEmpty() || existingName.isEmpty()) {
+                throw new IllegalStateException(
+                        "Duplicate component of type '" + type.getSimpleName() + "' found. " +
+                                "Both " + describeSource(existing) + " and " + describeSource(newResult) +
+                                " produce the same type. Use @Component(\"name\") with unique names to disambiguate."
+                );
+            }
+
+            if (existingName.equals(newName)) {
+                throw new IllegalStateException(
+                        "Duplicate component name '" + newName + "' for type '" + type.getSimpleName() + "'. " +
+                                "Both " + describeSource(existing) + " and " + describeSource(newResult) +
+                                " use the same @Component name."
+                );
+            }
+        }
+    }
+
+    private String describeSource(AbstractScanResult result) {
+        if (result instanceof ClassComponentResult classResult) {
+            return classResult.creationClass.getSimpleName();
+        } else if (result instanceof MethodComponentResult methodResult) {
+            return methodResult.getDeclaringClass().getSimpleName() + "#" + methodResult.getMethodName();
+        }
+        return result.getResultType().getSimpleName();
     }
 
 
     private void countDependencies() {
-        for (AbstractScanResult value : results.values()) {
-            if (!dependencyCount.containsKey(value.getResultType())) {
-                dependencyCount.put(value.getResultType(), getDependencyCount(value));
+        for (List<AbstractScanResult> resultList : results.values()) {
+            AbstractScanResult first = resultList.getFirst();
+            if (!dependencyCount.containsKey(first.getResultType())) {
+                dependencyCount.put(first.getResultType(), getDependencyCount(first));
             }
         }
     }
@@ -65,7 +104,8 @@ public class DependencyScanner {
 
         int count = result.getDependencies().size();
         for (Class<?> dependency : result.getDependencies()) {
-            AbstractScanResult depResult = results.get(dependency);
+            List<AbstractScanResult> depResults = results.get(dependency);
+            AbstractScanResult depResult = depResults != null ? depResults.getFirst() : null;
             count += getDependencyCount(depResult);
         }
 
@@ -78,7 +118,8 @@ public class DependencyScanner {
             if (declaredMethod.isAnnotationPresent(Component.class)) {
                 MethodComponentResult methodComponentResult = new MethodComponentResult(clazz, declaredMethod);
 
-                results.put(methodComponentResult.getResultType(), methodComponentResult);
+                checkForDuplicate(methodComponentResult.getResultType(), methodComponentResult);
+                results.computeIfAbsent(methodComponentResult.getResultType(), k -> new ArrayList<>()).add(methodComponentResult);
 
                 findAllMethodComponents(methodComponentResult.getResultType());
             }
@@ -88,28 +129,33 @@ public class DependencyScanner {
     public void ensureNoCircularDependency() {
         Set<Class<?>> visited = new HashSet<>();
         Set<Class<?>> stack = new HashSet<>();
-        for (AbstractScanResult result : results.values()) {
-            if (checkDependency(result, visited, stack)) {
-                throw new IllegalStateException("Circular dependency found: " + String.join(" -> ", stack.stream().map(Class::getSimpleName).toList()));
+        for (List<AbstractScanResult> resultList : results.values()) {
+            for (AbstractScanResult result : resultList) {
+                if (checkDependency(result, visited, stack)) {
+                    throw new IllegalStateException("Circular dependency found: " + String.join(" -> ", stack.stream().map(Class::getSimpleName).toList()));
+                }
             }
         }
     }
 
     public void ensureNoMissingDependencies() {
-        for (AbstractScanResult result : results.values()) {
-            if (result.getDependencies().contains(result.getResultType())) {
-                throw new IllegalStateException(result.getResultType().getSimpleName() + " can not be dependent on itself");
-            }
+        for (List<AbstractScanResult> resultList : results.values()) {
+            for (AbstractScanResult result : resultList) {
+                if (result.getDependencies().contains(result.getResultType())) {
+                    throw new IllegalStateException(result.getResultType().getSimpleName() + " can not be dependent on itself");
+                }
 
-            for (Class<?> dependency : result.getDependencies()) {
-                if (!results.containsKey(dependency)) {
-                    throw new IllegalStateException(dependency.getSimpleName() + " dependency " + dependency.getSimpleName() + " not found for" + result.getResultType().getSimpleName());
+                for (Class<?> dependency : result.getDependencies()) {
+                    if (!results.containsKey(dependency)) {
+                        throw new IllegalStateException(dependency.getSimpleName() + " dependency " + dependency.getSimpleName() + " not found for" + result.getResultType().getSimpleName());
+                    }
                 }
             }
         }
     }
 
     private boolean checkDependency(AbstractScanResult result, Set<Class<?>> visited, Set<Class<?>> stack) {
+        if (result == null) return false;
         if (stack.contains(result.getResultType())) {
             return true;
         }
@@ -121,7 +167,9 @@ public class DependencyScanner {
         stack.add(result.getResultType());
 
         for (Class<?> dependency : result.getDependencies()) {
-            if (checkDependency(results.get(dependency), visited, stack)) {
+            List<AbstractScanResult> depResults = results.get(dependency);
+            AbstractScanResult depResult = depResults != null ? depResults.getFirst() : null;
+            if (checkDependency(depResult, visited, stack)) {
                 return true;
             }
         }

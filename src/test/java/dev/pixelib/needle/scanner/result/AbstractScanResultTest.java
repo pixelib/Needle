@@ -50,6 +50,11 @@ class AbstractScanResultTest {
             public Class<?> getResultType() {
                 return WiredTarget.class;
             }
+
+            @Override
+            public String getName() {
+                return "";
+            }
         };
 
         Collection<Class<?>> deps = result.getWiredDependencies();
@@ -75,6 +80,11 @@ class AbstractScanResultTest {
             @Override
             public Class<?> getResultType() {
                 return WiredTarget.class;
+            }
+
+            @Override
+            public String getName() {
+                return "";
             }
         };
 
@@ -102,6 +112,11 @@ class AbstractScanResultTest {
             public Class<?> getResultType() {
                 return WiredTarget.class;
             }
+
+            @Override
+            public String getName() {
+                return "";
+            }
         };
 
         WiredTarget target = new WiredTarget();
@@ -122,6 +137,11 @@ class AbstractScanResultTest {
         @Override
         public Class<?> getResultType() {
             return String.class;
+        }
+
+        @Override
+        public String getName() {
+            return "";
         }
     }
 
