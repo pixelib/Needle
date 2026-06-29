@@ -58,11 +58,18 @@ public class DependencyScanner {
         if (result == null) {
             throw new IllegalStateException("Cannot get dependency count for null result");
         }
-        int count = result.getDependencies().size();
-        for (Class<?> dependency : result.getDependencies()) {
-            count += dependencyCount.computeIfAbsent(dependency, t -> getDependencyCount(results.get(t)));
+        Integer cached = dependencyCount.get(result.getResultType());
+        if (cached != null) {
+            return cached;
         }
 
+        int count = result.getDependencies().size();
+        for (Class<?> dependency : result.getDependencies()) {
+            AbstractScanResult depResult = results.get(dependency);
+            count += getDependencyCount(depResult);
+        }
+
+        dependencyCount.put(result.getResultType(), count);
         return count;
     }
 

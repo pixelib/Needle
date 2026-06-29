@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 @UtilityClass
 public class ReflectionUtils {
 
-    public <T extends Annotation> void callMethodWithAnnotation(Class<T> annotation, Object object) throws InvocationTargetException, IllegalAccessException {
+    public static <T extends Annotation> void callMethodWithAnnotation(Class<T> annotation, Object object) throws InvocationTargetException, IllegalAccessException {
         Method[] methods = object.getClass().getDeclaredMethods();
 
         for (Method method : methods) {
@@ -17,6 +17,7 @@ public class ReflectionUtils {
             if (declaredAnnotation == null) {
                 continue;
             }
+            method.setAccessible(true);
             method.invoke(object);
             return;
         }

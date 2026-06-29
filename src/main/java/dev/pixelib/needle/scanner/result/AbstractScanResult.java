@@ -45,7 +45,7 @@ public abstract class AbstractScanResult {
         }
     }
 
-    private Object getMatchingParameters(Class<?> type, Object... paramaters) {
+    protected Object getMatchingParameters(Class<?> type, Object... paramaters) {
         for (Object paramater : paramaters) {
             if (paramater.getClass().equals(type)) return paramater;
         }

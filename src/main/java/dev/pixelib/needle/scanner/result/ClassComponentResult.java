@@ -18,7 +18,12 @@ public class ClassComponentResult extends AbstractScanResult {
     @Override
     @SneakyThrows
     protected Object doCreate(Object... parameters) {
-        Object object = getCreationConstructor().newInstance(parameters);
+        Constructor<?> constructor = getCreationConstructor();
+        Object[] constructorParams = new Object[constructor.getParameterCount()];
+        for (int i = 0; i < constructor.getParameterCount(); i++) {
+            constructorParams[i] = getMatchingParameters(constructor.getParameterTypes()[i], parameters);
+        }
+        Object object = constructor.newInstance(constructorParams);
         ReflectionUtils.callMethodWithAnnotation(PostConstruct.class, object);
 
         setFields(object, parameters);
@@ -28,7 +33,7 @@ public class ClassComponentResult extends AbstractScanResult {
 
     @Override
     public Collection<Class<?>> getDependencies() {
-        List<Class<?>> paramDependencies = Arrays.asList(getCreationConstructor().getParameterTypes());
+        List<Class<?>> paramDependencies = new ArrayList<>(Arrays.asList(getCreationConstructor().getParameterTypes()));
         paramDependencies.addAll(getWiredDependencies());
         return Collections.unmodifiableList(paramDependencies);
     }
