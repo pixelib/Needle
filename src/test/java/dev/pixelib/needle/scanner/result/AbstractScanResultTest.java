@@ -1,6 +1,7 @@
 package dev.pixelib.needle.scanner.result;
 
 import dev.pixelib.needle.api.Wired;
+import lombok.Getter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -145,12 +146,10 @@ class AbstractScanResultTest {
         }
     }
 
+    @Getter
     public static class WiredTarget {
         @Wired
         private String stringVal;
 
-        public String getStringVal() {
-            return stringVal;
-        }
     }
 }

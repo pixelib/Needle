@@ -23,8 +23,8 @@ class ReflectionUtilsTest {
 
     @Test
     @DisplayName("should do nothing when no method has the annotation")
-    void shouldDoNothingWhenNoAnnotatedMethod() throws Exception {
-        ReflectionUtils.callMethodWithAnnotation(PostConstruct.class, new Object());
+    void shouldDoNothingWhenNoAnnotatedMethod() {
+        assertDoesNotThrow(() -> ReflectionUtils.callMethodWithAnnotation(PostConstruct.class, new Object()));
     }
 
     @Test

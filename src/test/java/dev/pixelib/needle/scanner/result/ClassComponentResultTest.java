@@ -149,9 +149,11 @@ class ClassComponentResultTest {
 
     static class MultiConstructorComponent {
         MultiConstructorComponent() {
+            // Empty for testing
         }
 
         MultiConstructorComponent(String a, String b) {
+            // Empty for testing
         }
     }
 
