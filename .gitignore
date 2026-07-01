@@ -39,3 +39,4 @@ build/
 .idea/
 
 .opencode
+.flattened-pom.xml
