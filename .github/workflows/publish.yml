@@ -49,7 +49,7 @@ jobs:
       - name: Update README version
         run: |
           TAG=${{ needs.create-release.outputs.tag }}
-          sed -i "/<groupId>dev\.pixelib\.needle<\/groupId>/,/<\/dependency>/ s|<version>[^<]*</version>|<version>${TAG}</version>|" README.md
+          sed -i "s|<version>[^<]*</version>|<version>${TAG}</version>|" README.md
       - uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
