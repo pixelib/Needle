@@ -1,95 +1,135 @@
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/1400bd15-e483-42cc-aa5d-cc52a5150ee0" />
-
+  <img src="https://raw.githubusercontent.com/pixelib/Needle/main/.github/assets/logo.svg" alt="Needle" width="160">
 </p>
 
-# Needle  ![Test Coverage](https://img.shields.io/badge/Test%20Coverage-prima-pink?&style=plastic) ![Hyves](https://img.shields.io/badge/Hyves-follow-green?labelColor=GREEN&style=social)
+<h1 align="center">Needle</h1>
 
-Needle is an ultra-lightweight dependency injection framework for Java, similar to Spring. It simplifies the management of dependencies in your application, making your code more modular, testable, and maintainable.
+<p align="center">
+  <a href="https://central.sonatype.com/artifact/dev.pixelib.needle/needle">
+    <img src="https://img.shields.io/maven-central/v/dev.pixelib.needle/needle?style=flat-square&color=blue&label=Maven%20Central" alt="Maven Central">
+  </a>
+  <a href="https://github.com/pixelib/Needle/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/pixelib/Needle/ci.yml?style=flat-square&label=CI" alt="CI">
+  </a>
+  <a href="https://raw.githubusercontent.com/pixelib/Needle/main/.github/badges/jacoco.svg">
+    <img src="https://raw.githubusercontent.com/pixelib/Needle/main/.github/badges/jacoco.svg" alt="Coverage">
+  </a>
+  <img src="https://img.shields.io/badge/Java-21-blue?style=flat-square&logo=openjdk&logoColor=white" alt="Java 21">
+  <img src="https://img.shields.io/github/license/pixelib/Needle?style=flat-square&color=blue" alt="License">
+</p>
 
-## ✨ Features
+<p align="center">
+  <b>Ultra-lightweight dependency injection for Java.</b><br>
+  Minimal overhead, annotation-driven, zero config.
+</p>
 
-- **Lightweight**: Minimal overhead, designed to be fast and efficient.
-- **Annotation-based**: Use simple annotations to define dependencies.
-- **Automatic Dependency Resolution**: Automatically resolves and injects dependencies.
-- **Integration**: Easily integrates with other frameworks and libraries.
+---
 
-## 🚀 Usage
+## Features
 
-### 📘 Main class Example
+- **Lightweight** – tiny footprint, fast startup, no XML config
+- **Annotation-driven** – `@Component`, `@Wired`, `@Named`, `@PreDestroy`
+- **Automatic resolution** – scans classpath, resolves graphs, handles cycles
+- **Constructor & field injection** – `@Wired` on fields or constructor params
+- **Method components** – `@Component` on factory methods for programmatic wiring
+- **Shutdown hooks** – automatic `@PreDestroy` cleanup via runtime hook
+
+## Getting Started
+
+### Install
+
+Add dependency (Maven Central):
+
+```xml
+<dependency>
+    <groupId>dev.pixelib.needle</groupId>
+    <artifactId>needle</artifactId>
+    <version>1.1.0</version>
+</dependency>
+```
+
+### Quick start
 
 ```java
-public class Main {
-    public static void main(String[] args) {
-        Needle init = Needle.init(Main.class);
+public class App {
+    static void main(String[] args) {
+        Needle needle = Needle.init(App.class);
     }
 }
 ```
 
-### 📙 Class components Example
+---
+
+<details>
+<summary><b>More examples</b></summary>
+
+#### Component classes
 
 ```java
 @Component
 public class ExampleService {
-    
-    private String name;
+    @Wired
+    private Database db;
 }
 ```
-### 📗 Method components Example
+
+#### Named components
 
 ```java
 @Component
-public class SampleConfig {
+@Named("main")
+public class MainDatabase implements Database { }
 
+@Component
+@Named("backup")
+public class BackupDatabase implements Database { }
+```
+
+#### Factory / method components
+
+```java
+@Component
+public class AppConfig {
     @Component
-    SampleComponent create() {
-        return new SampleComponent();
-    }
-}
-
-```
-
-### 📕 Defining Dependencies
-
-```java
-
-@Getter
-public class B {
-    @Wired
-    private C depC;
-}
-```
-
-```java
-
-@Getter
-public class SampleService {
-    
-    private final SampleComponent sampleComponent;
-    
-    public SampleService(SampleComponent sampleComponent) {
-        this.sampleComponent = sampleComponent;
+    Database createDatabase() {
+        return new Database("jdbc:...");
     }
 }
 ```
 
-## 📦 Installation
+#### Constructor injection
 
-Add the following dependency to your Maven project:
+```java
+@Component
+public class OrderService {
+    private final PaymentGateway gateway;
 
-```xml
-<dependency>
-    <groupId>dev.pixelib</groupId>
-    <artifactId>needle</artifactId>
-    <version>1.0.0</version>
-</dependency>
+    public OrderService(PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
+}
 ```
 
-## 🤝 Contributing
+</details>
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+---
 
-## 📄 License
+## Requirements
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Java 21+
+
+## Build
+
+```bash
+mvn clean test
 ```
+
+JaCoCo coverage report generated at `target/site/jacoco/index.html`.
+
+## Contributing
+
+PRs welcome. Keep it lightweight.
+
+## License
+
+GNU General Public License v3.0 — see [LICENSE](LICENSE).
